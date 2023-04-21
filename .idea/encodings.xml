@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/Main.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/model/Bot.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/model/crypto/Caesar.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/model/crypto/DateAlphabet.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/model/crypto/Start.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/model/crypto/Vigenere.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/model/keyboard/InlineButton.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/model/keyboard/InlineButtonConfig.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/model/message/Messages.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/model/parsing/MoneyDate.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/model/teams/ExchangeRate.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/model/teams/Help.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/model/teams/Processor.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/model/teams/Start.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/model/teams/Team.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/model/teams/TeamsConfig.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/setting/BotConfig.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
+</project>
