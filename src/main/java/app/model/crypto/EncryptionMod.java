@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class EncryptionMod {
     public static EncryptionMod getEncryptionMod(){
         if(encryptionMod == null){
             encryptionMod = new EncryptionMod();
-            System.out.println("Був включений режим EncryptionMod СТАТУС [ОК]");
+            System.out.println("\nБув включений режим EncryptionMod СТАТУС [ОК]");
         }
         return encryptionMod;
     }
@@ -84,19 +85,17 @@ public class EncryptionMod {
     }
     public SendMessage sendInfoEncryptionModMenu(String idChat){
         creatMarkupInlineMenuEncryptionMod();
-        String text = "Шифр Цезаря, також відомий як шифр зсуву, код Цезаря — один із найпростіших і найвідоміших методів шифрування.\n"
-                + "\n"
-                + "Я тобі пропуную вибрати декілька функцій зв'язані зі шифром Цезаря"
-                +"\n 1) Шифрування за допомогу числового ключа від 1 до 41 числа"
-                +"\n 2) Розшифрування за допомогу числового ключа від 1 до 41 числа"
-                +"\n 3) Брут форс атака на шифр \"Цезарь\" ";
+        String text = "Я тобі пропуную вибрати декілька функцій зв'язані зі шифром \"Цезаря\"."
+                +"\n 1) Шифрування за допомогу числового ключа."
+                +"\n 2) Розшифрування за допомогу числового ключа."
+                +"\n 3) Брут форс атака на шифр \"Цезарь\". ";
 
         return new Messages(text,idChat,inlineKeyboardMarkup).creatMessages();
     }
     public SendMessage sendInfoEncryptionSelectLanguage(String idChat){
         creatMarkupInlineSelectLanguage();
-        String text = "Вибери одне з доступних мов для шифрування тексту";
-
+        String text = "Вибери одне з доступних мов для шифрування тексту. \n" +
+        "Увага як що вибрана мова не співпадатиме з текстом \"Jarvis\" автоматично перевичначить.";
         return new Messages(text,idChat,inlineKeyboardMarkup).creatMessages();
     }
     public SendMessage sendInfoEncryptionSelectTextOrFile(String idChat){
@@ -104,16 +103,51 @@ public class EncryptionMod {
         return new Messages(text,idChat).creatMessages();
     }
     public SendMessage sendInfoEncryptionSelectKey(String idChat){
-        String text = "Тепер напиши цифру ключа від 1 до 41";
+        String text = "Тепер напиши цифру ключа.\n"
+                +"Для української мови від 1 до 41. \n"
+                +"Для англійської мови від 1 до 34. \n"
+                +"Увага як що ви ведете цифру за цього діапазону \"Jarvis\" сам рандомно вибере число.";
         return new Messages(text,idChat).creatMessages();
     }
     public SendMessage sendInfoEncryptionResult(String idChat){
         Caesar caesar = new Caesar(language,textUser,key);
+        caesar.encryption();
         creatMarkupInlineBack();
-        String text = "Шифрування пройшло успішно: "+"\n"
-                +"Ключь доступа: "+ key +"\n"+
+        String text = "Шифрування пройшло успішно:"+"\n"
+                +"Ключь доступа: "+ caesar.getKey() +"\n"+
+                "Мова: "+ caesar.getLanguage() +"\n"+
                 "Шифр: "+
-                "\n"+caesar.encryption();
+                "\n"+caesar.getEncryptionText();
+        System.out.println("\nШифрування пройшло успішно "+"СТАТУС [OK]");
+        return new Messages(text,idChat,inlineKeyboardMarkup).creatMessages();
+    }
+    public SendMessage sendInfoDecryptionSelectLanguage(String idChat){
+        creatMarkupInlineSelectLanguage();
+        String text = "Вибери одне з доступних мов для розшифрування тексту. \n" +
+                "Уага як що ви виберете не правильну мову бот автоматично перевизначить мову.";
+
+        return new Messages(text,idChat,inlineKeyboardMarkup).creatMessages();
+    }
+    public SendMessage sendInfoDecryptionSelectTextOrFile(String idChat){
+        String text = "Тепер відправ мені файл з текстом або напиши сам текст який хочеш розшифрувати.";
+        return new Messages(text,idChat).creatMessages();
+    }
+    public SendMessage sendInfoDecryptionSelectKey(String idChat){
+        String text = "Тепер напиши цифру ключа.\n"
+                +"Для української мови від 1 до 41. \n"
+                +"Для англійської мови від 1 до 34. \n";
+        return new Messages(text,idChat).creatMessages();
+    }
+    public SendMessage sendInfoDecryptionResult(String idChat){
+        Caesar caesar = new Caesar(language,textUser,key);
+        caesar.decryption();
+        creatMarkupInlineBack();
+        String text = "Розшифрування пройшло успішно:" +"\n"
+                +"Ключь доступа: "+ caesar.getKey() +"\n"+
+                "Мова: "+ caesar.getLanguage() +"\n"+
+                "Шифр: "+
+                "\n"+caesar.getDecryptionText();
+        System.out.println("\nРозшифрування пройшло успішно "+"СТАТУС [OK]");
         return new Messages(text,idChat,inlineKeyboardMarkup).creatMessages();
     }
     private boolean isActiveEncryptionMod = false;
@@ -124,9 +158,11 @@ public class EncryptionMod {
     private int key;
 
     public void setLanguage(String language) {
+        System.out.println("Встановлено мову "+language+" СТАТУС [OK]");
         this.language = language;
     }
     public void setEncryptionModOption(String encryptionModOption){
+        System.out.println("Встановлено режим "+encryptionModOption+" СТАТУС [OK]");
         this.encryptionModOption = encryptionModOption;
     }
     public void setActiveEncryptionMod(boolean activeEncryptionMod) {
@@ -134,6 +170,9 @@ public class EncryptionMod {
     }
     public void setStageSetting(String stageSetting) {
         this.stageSetting = stageSetting;
+    }
+    public String getEncryptionModOption(){
+        return encryptionModOption;
     }
     public boolean getIsActiveEncryptionMod() {
         return isActiveEncryptionMod;
@@ -148,12 +187,20 @@ public class EncryptionMod {
             System.out.println("Був встановлений текст СТАТУС [ОК]");
             this.textUser = userMessage;
             this.stageSetting = "setKey";
-            sendMessage = sendInfoEncryptionSelectKey(idChat);
+            if(encryptionModOption.equals("encryption")){
+                sendMessage = sendInfoEncryptionSelectKey(idChat);
+            } else if (encryptionModOption.equals("decryption")) {
+                sendMessage = sendInfoDecryptionSelectKey(idChat);
+            }
         } else if (this.stageSetting.equals("setKey")) {
             this.key = Integer.parseInt(userMessage);
             System.out.printf("\nБув встановлений ключь %d СТАТУС [ОК]",key);
             this.stageSetting = "full";
-            sendMessage = sendInfoEncryptionResult(idChat);
+            if(encryptionModOption.equals("encryption")){
+                sendMessage = sendInfoEncryptionResult(idChat);
+            } else if (encryptionModOption.equals("decryption")) {
+                sendMessage = sendInfoDecryptionResult(idChat);
+            }
             this.isResetEncryptionMod = true;
         }
         return sendMessage;
@@ -166,7 +213,4 @@ public class EncryptionMod {
         key = 0;
         encryptionMod = null;
     }
-
-
-
 }

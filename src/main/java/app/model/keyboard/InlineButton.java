@@ -12,8 +12,8 @@ public class InlineButton {
     private static InlineButton inlineButton;
     public InlineButton(String textButton, String callBackData){
         this.keyboardButton = new InlineKeyboardButton();
-        keyboardButton.setText(convectorTextFormatUTF_8(textButton));
-        keyboardButton.setCallbackData(convectorTextFormatUTF_8(callBackData));
+        keyboardButton.setText(textButton);
+        keyboardButton.setCallbackData(callBackData);
     }
 
     public InlineButton() {
@@ -42,11 +42,6 @@ public class InlineButton {
         System.out.println("_____________________________________________________");
         System.out.println("Список вбудованих кнопок добавлено СТАТУС [ОК] SIZE: "+ inlineDateButtonList.size());
         System.out.println("_____________________________________________________");
-    }
-
-    private String convectorTextFormatUTF_8(String srt){
-        String result = new String(srt.getBytes(), StandardCharsets.UTF_8);
-        return result;
     }
 
 }

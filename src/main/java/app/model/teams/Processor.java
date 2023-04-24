@@ -8,24 +8,23 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Processor{
     private Update update;
     private Team team;
-    private InlineButton inlineButtonDate;
     private static Processor processor;
+    private static InlineButton inlineButton;
     private static EncryptionMod encryptionMod;
 
     private Processor(){
         initiation();
         this.teamsList = team.getTeamList();
-        this.dateButtonList = inlineButtonDate.getInlineDateButtonList();
     }
     public static Processor getProcessor(){
         if(processor == null){
             processor = new Processor();
+            inlineButton = InlineButton.getInlineButton();
         }
         return processor;
     }
@@ -45,7 +44,6 @@ public class Processor{
         } else if (update.hasCallbackQuery()) {
             this.idChat = String.valueOf(update.getCallbackQuery().getMessage().getChatId());
             this.dataButton = update.getCallbackQuery().getData();
-            this.dateButtonList = new ArrayList<>(InlineButton.getInlineButton().getInlineDateButtonList());
             processorButton();
         }
         return sendMessage;
@@ -56,16 +54,17 @@ public class Processor{
         System.out.println("Повідомлення отримав, починаю опрацьовувати  СТАТУС [ОК]");
 
         if(checkCommands(userMessage)) {
-             if(userSendTeam.equals(teamsList.get(teamsList.indexOf(TeamsConfig.START.getTitle())))){
+             if(userSendTeam.equals(TeamsConfig.START.getTitle())){
                  getMenuStart();
                  return sendMessage;
              }
 
-            if(userSendTeam.equals(teamsList.get(teamsList.indexOf(TeamsConfig.HELP.getTitle())))) {
+            if(userSendTeam.equals(TeamsConfig.HELP.getTitle())) {
                 Help help = new Help(idChat, teamsList);
                 this.sendMessage = help.teamHelpStart();
                 return sendMessage;
             }
+
         } else if (encryptionMod != null && encryptionMod.getIsActiveEncryptionMod()) {
             this.sendMessage = encryptionMod.configurationEncryptionMod(userMessage,idChat);
             if(encryptionMod.getIsResetEncryptionMod()){
@@ -78,19 +77,10 @@ public class Processor{
                 idChat).creatMessages();
         return sendMessage;
     }
-    private List<String> dateButtonList;
+
     public SendMessage processorButton() throws IOException {
 
-        final String EXCHANGE_RATE = InlineButtonConfig.EXCHANGE_RATE.getDateTitle();
-        final String ENCRYPTION_MOD = InlineButtonConfig.ENCRYPTION_MOD.getDateTitle();
-        final String ENCRYPTION = InlineButtonConfig.ENCRYPTION.getDateTitle();
-        final String DECRYPTION = InlineButtonConfig.DECRYPTION.getDateTitle();
-        final String BRUT_FORCE = InlineButtonConfig.BRUT_FORCE.getDateTitle();
-        final String LANG_UK = InlineButtonConfig.LANG_UK.getDateTitle();
-        final String LANG_ENG = InlineButtonConfig.LANG_ENG.getDateTitle();
-        final String BACK = InlineButtonConfig.BACK.getDateTitle();
-
-        if(dataButton.equals(dateButtonList.get(dateButtonList.indexOf(EXCHANGE_RATE)))){
+        if(dataButton.equals(InlineButtonConfig.EXCHANGE_RATE.getDateTitle())){
             ExchangeRate exchangeRate = new ExchangeRate();
             this.sendMessage = new Messages(
                     exchangeRate.start(),idChat,exchangeRate.getInlineKeyboardMarkup()
@@ -98,31 +88,40 @@ public class Processor{
         }
 
         //EncryptionMod
-        else if (dataButton.equals(dateButtonList.get(dateButtonList.indexOf(ENCRYPTION_MOD)))) {
+        else if (dataButton.equals(InlineButtonConfig.ENCRYPTION_MOD.getDateTitle())) {
             encryptionMod = EncryptionMod.getEncryptionMod();
             encryptionMod.setActiveEncryptionMod(true);
             this.sendMessage = encryptionMod.sendInfoEncryptionModMenu(idChat);
         }
-        else if(dataButton.equals(dateButtonList.get(dateButtonList.indexOf(ENCRYPTION)))){
+        else if(dataButton.equals(InlineButtonConfig.ENCRYPTION.getDateTitle())){
             this.sendMessage = encryptionMod.sendInfoEncryptionSelectLanguage(idChat);
-            encryptionMod.setEncryptionModOption(ENCRYPTION);
+            encryptionMod.setEncryptionModOption(InlineButtonConfig.ENCRYPTION.getDateTitle());
         }
-        else if(dataButton.equals(dateButtonList.get(dateButtonList.indexOf(DECRYPTION)))){
-            encryptionMod.setEncryptionModOption(DECRYPTION);
+        else if(dataButton.equals(InlineButtonConfig.DECRYPTION.getDateTitle())){
+            this.sendMessage = encryptionMod.sendInfoDecryptionSelectLanguage(idChat);
+            encryptionMod.setEncryptionModOption(InlineButtonConfig.DECRYPTION.getDateTitle());
         }
-        else if(dataButton.equals(dateButtonList.get(dateButtonList.indexOf(BRUT_FORCE)))){
-            encryptionMod.setEncryptionModOption(BRUT_FORCE);
+        else if(dataButton.equals(InlineButtonConfig.BRUT_FORCE.getDateTitle())){
+            encryptionMod.setEncryptionModOption(InlineButtonConfig.BRUT_FORCE.getDateTitle());
         }
-        else if(dataButton.equals(dateButtonList.get(dateButtonList.indexOf(LANG_UK)))){
-            encryptionMod.setLanguage(LANG_UK);
+        else if(dataButton.equals(InlineButtonConfig.LANG_UK.getDateTitle())){
+            encryptionMod.setLanguage(InlineButtonConfig.LANG_UK.getDateTitle());
             encryptionMod.setStageSetting("setTextUser");
-            this.sendMessage = encryptionMod.sendInfoEncryptionSelectTextOrFile(idChat);
+            if(encryptionMod.getEncryptionModOption().equals("encryption")){
+                this.sendMessage = encryptionMod.sendInfoEncryptionSelectTextOrFile(idChat);
+            } else if (encryptionMod.getEncryptionModOption().equals("decryption")) {
+                this.sendMessage = encryptionMod.sendInfoDecryptionSelectTextOrFile(idChat);
+            }
         }
-        else if(dataButton.equals(dateButtonList.get(dateButtonList.indexOf(LANG_ENG)))){
-            encryptionMod.setLanguage(LANG_ENG);
+        else if(dataButton.equals(InlineButtonConfig.LANG_ENG.getDateTitle())){
+            encryptionMod.setLanguage(InlineButtonConfig.LANG_ENG.getDateTitle());
             encryptionMod.setStageSetting("setTextUser");
-            this.sendMessage = encryptionMod.sendInfoEncryptionSelectTextOrFile(idChat);
-        } else if (dataButton.equals(dateButtonList.get(dateButtonList.indexOf(BACK)))) {
+            if(encryptionMod.getEncryptionModOption().equals("encryption")){
+                this.sendMessage = encryptionMod.sendInfoEncryptionSelectTextOrFile(idChat);
+            } else if (encryptionMod.getEncryptionModOption().equals("decryption")) {
+                this.sendMessage = encryptionMod.sendInfoDecryptionSelectTextOrFile(idChat);
+            }
+        } else if (dataButton.equals(InlineButtonConfig.BACK.getDateTitle())) {
             getMenuStart();
             return sendMessage;
         }
@@ -140,7 +139,6 @@ public class Processor{
 
     private void initiation(){
         this.team = Team.getTeam();
-        this.inlineButtonDate = InlineButton.getInlineButton();
     }
 
     private void getMenuStart(){

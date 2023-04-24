@@ -1,7 +1,7 @@
 package app.model.crypto;
 
 public enum DateAlphabet {
-    ENGLISH("AFHIJKLMNOSWXYZ.,\":-!? "),
+    ENGLISH("ABCDEFGHIJKLMNOPQRSTUVWXYZ.,\":-!? "),
     UKRAINIAN("АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩьЮЯ,.\":-!? ");
 
     private String date;
