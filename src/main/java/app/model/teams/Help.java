@@ -7,11 +7,10 @@ import java.util.List;
 
 public class Help {
     private String idChat;
-    private List<String> teams;
+    private List<String> teams  = Team.getTeam().getTeamList();
 
-    public Help(String idChat, List<String> teams){
+    public Help(String idChat){
         this.idChat = idChat;
-        this.teams = teams;
     }
     public SendMessage teamHelpStart(){
         Messages messages = new Messages(setText(),idChat);

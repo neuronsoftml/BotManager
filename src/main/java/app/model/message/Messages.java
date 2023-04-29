@@ -9,7 +9,6 @@ public class Messages {
     private String text;
     private String id;
     private SendMessage sendMessage;
-
     private InlineKeyboardMarkup inlineKeyboardMarkup;
 
     public Messages(String text, String id){

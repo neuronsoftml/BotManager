@@ -1,7 +1,6 @@
 package app.model.crypto;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Caesar {
     private String dateAlphabet;
@@ -184,18 +183,50 @@ public class Caesar {
     }
 
     public String analyzerBruteForce(List<String> dataBaseResult) {
-        char[] dataElement = {'.', '!', '?', ':'};
-
-        List<String> newDataBaseResult = new ArrayList<>();
-
+        char[] dataElement = DateAlphabet.UKRAINIAN.getDate().toCharArray();
         for (String element : dataBaseResult) {
-            int collLengthWord; //  Довжина слова
-            int collLengthComa; //  Кількість ком
-            boolean isWordOneUpCase; //Перша буква з великої літери
-            boolean isEndOfSentence; //Закінчення речення спец символом .!?:
+            TreeMap<String,Integer> newDataBaseResult = new TreeMap<>();
+            char[] arrayStr = element.toCharArray();
+            for(int i = 0;  i < arrayStr.length; i++){
+                String strElement = String.valueOf(arrayStr[i]).toUpperCase();
 
-            int compliancePercentage; //Відсоток правельної відповіді
+                for(int j = 0; j < dataElement.length; j++){
+                    String dataStrElement = String.valueOf(dataElement[j]);
+
+                    if(strElement.equals(dataStrElement)){
+                        if(newDataBaseResult.containsKey(dataStrElement)){
+                            int coll = newDataBaseResult.get(dataStrElement);
+                            newDataBaseResult.put(dataStrElement,coll+1);
+                        }else {
+                            newDataBaseResult.put(dataStrElement,1);
+                        }
+                        break;
+                    }
+                }
+            }
+            System.out.println("__________________________________________________________________");
             System.out.println(element);
+            int collBal = 0;
+            for(Map.Entry entry: newDataBaseResult.entrySet()) {
+                System.out.printf("Буква %s  - %d \n",entry.getKey(),entry.getValue());
+                int value  = (int) entry.getValue();
+                String key = (String) entry.getKey();
+
+                for(int x = 0; x < dataArrayAlphabetToUp.length; x++){
+                    if(key.equals(String.valueOf(dataArrayAlphabetToUp[x])) && value >= 7){
+                        collBal++;
+                    }
+                }
+            }
+            if(collBal >= 5){
+                System.out.println("__________________________________________________________________");
+                System.out.println("__________________________________________________________________");
+                System.out.println(element);
+                System.out.println("__________________________________________________________________");
+                System.out.println("__________________________________________________________________");
+                break;
+            }
+            System.out.println("__________________________________________________________________");
         }
 
 
