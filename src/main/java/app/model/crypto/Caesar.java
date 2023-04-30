@@ -1,5 +1,7 @@
 package app.model.crypto;
 
+import app.model.auxiliaryTools.FileManager;
+
 import java.util.*;
 
 public class Caesar {
@@ -183,54 +185,47 @@ public class Caesar {
     }
 
     public String analyzerBruteForce(List<String> dataBaseResult) {
-        char[] dataElement = DateAlphabet.UKRAINIAN.getDate().toCharArray();
+        FileManager fileManager = new FileManager();
+        String result = null;
+        TreeMap<String,Integer> resultList = new TreeMap<>();
         for (String element : dataBaseResult) {
-            TreeMap<String,Integer> newDataBaseResult = new TreeMap<>();
-            char[] arrayStr = element.toCharArray();
-            for(int i = 0;  i < arrayStr.length; i++){
-                String strElement = String.valueOf(arrayStr[i]).toUpperCase();
+            List<String> linesElement = new ArrayList<>();
+            StringTokenizer stringTokenizer = new StringTokenizer(element," ");
+            int collScores = 0;
+            while (stringTokenizer.hasMoreTokens()){
+                linesElement.add(stringTokenizer.nextToken());
+            }
 
-                for(int j = 0; j < dataElement.length; j++){
-                    String dataStrElement = String.valueOf(dataElement[j]);
+            for(String linesEl : linesElement) {
+                char letter = linesEl.toUpperCase().charAt(0);
+                List<String> data;
+                if (fileManager.getData(letter) == null) {
+                    continue;
+                } else {
+                    data = new ArrayList<>(fileManager.getData(letter));
+                    for (String l : data) {
 
-                    if(strElement.equals(dataStrElement)){
-                        if(newDataBaseResult.containsKey(dataStrElement)){
-                            int coll = newDataBaseResult.get(dataStrElement);
-                            newDataBaseResult.put(dataStrElement,coll+1);
-                        }else {
-                            newDataBaseResult.put(dataStrElement,1);
+                        if (linesEl.toLowerCase().equals(removeSpecialCharacters(l).toLowerCase())) {
+                            collScores++;
                         }
-                        break;
                     }
                 }
-            }
-            System.out.println("__________________________________________________________________");
-            System.out.println(element);
-            int collBal = 0;
-            for(Map.Entry entry: newDataBaseResult.entrySet()) {
-                System.out.printf("Буква %s  - %d \n",entry.getKey(),entry.getValue());
-                int value  = (int) entry.getValue();
-                String key = (String) entry.getKey();
 
-                for(int x = 0; x < dataArrayAlphabetToUp.length; x++){
-                    if(key.equals(String.valueOf(dataArrayAlphabetToUp[x])) && value >= 7){
-                        collBal++;
-                    }
-                }
             }
-            if(collBal >= 5){
-                System.out.println("__________________________________________________________________");
-                System.out.println("__________________________________________________________________");
-                System.out.println(element);
-                System.out.println("__________________________________________________________________");
-                System.out.println("__________________________________________________________________");
-                break;
-            }
-            System.out.println("__________________________________________________________________");
+            resultList.put(element,collScores);
         }
-
-
-        return "";
+        String strResultList = null;
+        int  maxValueResultList = 0;
+        for(String em : resultList.keySet()){
+            Integer value = resultList.get(em);
+           // System.out.println(em + " --> " + value);
+            
+            if(value > maxValueResultList){
+                strResultList = em;
+                maxValueResultList = value;
+            }
+        }
+        return strResultList;
     }
     private int generationRandomKey(int maxValue){
         System.out.println("спрацював генератор");
@@ -252,5 +247,27 @@ public class Caesar {
     }
     public String getDecryptionText(){
         return  decryptionText;
+    }
+
+    private String removeSpecialCharacters(String str){
+        int length = str.length();
+        String result = "";
+        char[] arrayStr = str.toCharArray();
+        char[] specialCharacters = DateAlphabet.SPECIAL_CHARACTERS.getDate().toCharArray();
+
+        boolean isSpecialCharacters;
+        for(int i = 0; i < arrayStr.length; i++){
+            isSpecialCharacters = false;
+           for(int j = 0; j < specialCharacters.length; j++){
+               if(arrayStr[i] == specialCharacters[j]){
+                    isSpecialCharacters = true;
+                   break;
+               }
+           }
+           if (!isSpecialCharacters){
+               result = result + String.valueOf(arrayStr[i]);
+           }
+        }
+        return result;
     }
 }
