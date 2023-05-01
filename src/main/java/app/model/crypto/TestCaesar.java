@@ -15,7 +15,8 @@ public class TestCaesar {
        System.out.println("-____________BruteForce_________________");
        System.out.println("----------------------------------------");
        Caesar bruteForceCaesar =  new Caesar("LanguageUkraine",caesar.getEncryptionText());
-       bruteForceCaesar.bruteForce(41);
+        bruteForceCaesar.bruteForce();
+       System.out.println(bruteForceCaesar.getBruteForceText());
 
     }
 }

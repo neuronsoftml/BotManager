@@ -104,7 +104,7 @@ public class EncryptionMod {
     }
     public SendMessage sendInfoEncryptionSelectKey(String idChat){
         String text = "Тепер напиши цифру ключа.\n"
-                +"Для української мови від 1 до 41. \n"
+                +"Для української мови від 1 до 40. \n"
                 +"Для англійської мови від 1 до 34. \n"
                 +"Увага як що ви ведете цифру за цього діапазону \"Jarvis\" сам рандомно вибере число.";
         return new Messages(text,idChat).creatMessages();
@@ -134,7 +134,7 @@ public class EncryptionMod {
     }
     public SendMessage sendInfoDecryptionSelectKey(String idChat){
         String text = "Тепер напиши цифру ключа.\n"
-                +"Для української мови від 1 до 41. \n"
+                +"Для української мови від 1 до 40. \n"
                 +"Для англійської мови від 1 до 34. \n";
         return new Messages(text,idChat).creatMessages();
     }
@@ -148,6 +148,28 @@ public class EncryptionMod {
                 "Шифр: "+
                 "\n"+caesar.getDecryptionText();
         System.out.println("\nРозшифрування пройшло успішно "+"СТАТУС [OK]");
+        return new Messages(text,idChat,inlineKeyboardMarkup).creatMessages();
+    }
+    public SendMessage sendInfoBrutForceAttackSelectLanguage(String idChat){
+        creatMarkupInlineSelectLanguage();
+        String text = "Вибери одне з доступних мов для здійснення Brut-Force атаки на шифр Цезаря. \n" +
+                "\n Brut-Force атака здійснюється за методом підбору ключа до шифра, та статичного аналізу результатів."+
+                "\n Увага як що ви виберете не правильну мову бот автоматично перевизначить мову.";
+
+        return new Messages(text,idChat,inlineKeyboardMarkup).creatMessages();
+    }
+    public SendMessage sendInfoBrutForceAttackTextOrFile(String idChat){
+        String text = "Тепер відправ мені файл з текстом або напиши сам текст який атакувати.";
+        return new Messages(text,idChat).creatMessages();
+    }
+    public SendMessage sendInfoBrutForceAttackResult(String idChat){
+        Caesar caesar = new Caesar(language,textUser);
+        caesar.bruteForce();
+        creatMarkupInlineBack();
+        String text = "Брут форс атака пройшла успішно:"+"\n"+
+                "Текст: "+
+                "\n"+caesar.getBruteForceText();
+        System.out.println("\nБрут форс атака пройшла успішно "+"СТАТУС [OK]");
         return new Messages(text,idChat,inlineKeyboardMarkup).creatMessages();
     }
     private boolean isActiveEncryptionMod = false;
@@ -181,24 +203,33 @@ public class EncryptionMod {
     public boolean getIsResetEncryptionMod() {
         return isResetEncryptionMod;
     }
+
+    private final String SET_TEXT_USER = "setTextUser";
+    private final String SET_KEY = "setKey";
+    private final String ENCRYPTION = "encryption";
+    private final String DECRYPTION = "decryption";
+    private final String BRUT_FORCE = "brut_force";
+
     public SendMessage configurationEncryptionMod(String userMessage, String idChat){
         SendMessage sendMessage = null;
-        if(this.stageSetting.equals("setTextUser")){
+        if(this.stageSetting.equals(SET_TEXT_USER)){
             System.out.println("Був встановлений текст СТАТУС [ОК]");
             this.textUser = userMessage;
-            this.stageSetting = "setKey";
-            if(encryptionModOption.equals("encryption")){
+            this.stageSetting = SET_KEY;
+            if(encryptionModOption.equals(ENCRYPTION)){
                 sendMessage = sendInfoEncryptionSelectKey(idChat);
-            } else if (encryptionModOption.equals("decryption")) {
+            } else if (encryptionModOption.equals(DECRYPTION)) {
                 sendMessage = sendInfoDecryptionSelectKey(idChat);
+            } else if (encryptionModOption.equals(BRUT_FORCE)) {
+                sendMessage = sendInfoBrutForceAttackResult(idChat);
+                this.isResetEncryptionMod = true;
             }
-        } else if (this.stageSetting.equals("setKey")) {
+        } else if (this.stageSetting.equals(SET_KEY)) {
             this.key = Integer.parseInt(userMessage);
             System.out.printf("\nБув встановлений ключь %d СТАТУС [ОК]",key);
-            this.stageSetting = "full";
-            if(encryptionModOption.equals("encryption")){
+            if(encryptionModOption.equals(ENCRYPTION)){
                 sendMessage = sendInfoEncryptionResult(idChat);
-            } else if (encryptionModOption.equals("decryption")) {
+            } else if (encryptionModOption.equals(DECRYPTION)) {
                 sendMessage = sendInfoDecryptionResult(idChat);
             }
             this.isResetEncryptionMod = true;

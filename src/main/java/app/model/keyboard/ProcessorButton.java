@@ -84,6 +84,7 @@ public class ProcessorButton {
         encryptionMod.setEncryptionModOption(InlineButtonConfig.DECRYPTION.getDateTitle());
     }
     private void brutForce(){
+        this.outputSendMessage = encryptionMod.sendInfoBrutForceAttackSelectLanguage(inputIdChat);
         encryptionMod.setEncryptionModOption(InlineButtonConfig.BRUT_FORCE.getDateTitle());
     }
     private void setLangUK(){
@@ -93,6 +94,8 @@ public class ProcessorButton {
             this.outputSendMessage = encryptionMod.sendInfoEncryptionSelectTextOrFile(inputIdChat);
         } else if (encryptionMod.getEncryptionModOption().equals("decryption")) {
             this.outputSendMessage = encryptionMod.sendInfoDecryptionSelectTextOrFile(inputIdChat);
+        } else if (encryptionMod.getEncryptionModOption().equals("brut_force")) {
+            this.outputSendMessage = encryptionMod.sendInfoBrutForceAttackTextOrFile(inputIdChat);
         }
     }
     private void setLangENG(){
@@ -102,6 +105,8 @@ public class ProcessorButton {
             this.outputSendMessage = encryptionMod.sendInfoEncryptionSelectTextOrFile(inputIdChat);
         } else if (encryptionMod.getEncryptionModOption().equals("decryption")) {
             this.outputSendMessage = encryptionMod.sendInfoDecryptionSelectTextOrFile(inputIdChat);
+        } else if (encryptionMod.getEncryptionModOption().equals("brut_force")) {
+            this.outputSendMessage = encryptionMod.sendInfoBrutForceAttackTextOrFile(inputIdChat);
         }
     }
     private void getMenuStart(){

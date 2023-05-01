@@ -1,6 +1,7 @@
 package app.model.crypto;
 
 import app.model.auxiliaryTools.FileManager;
+import org.apache.commons.codec.language.bm.Languages;
 
 import java.util.*;
 
@@ -9,6 +10,7 @@ public class Caesar {
     private String message;
     private String language;
     private int retreat;
+    private int cipherDepth;
     private char[] dataArrayAlphabetToUp;
     private char[] dataArrayAlphabetToLower;
     private char[] dataMessage;
@@ -30,6 +32,9 @@ public class Caesar {
 
         this.dataMessage = this.message.toCharArray();
     }
+
+    private final String languageUkraine = "LanguageUkraine";
+    private final String languageEnglish = "LanguageEnglish";
     private void checkSelectLanguage(String language){
         checkTextLanguage(language);
         if (this.language.equals("LanguageEnglish")) {
@@ -39,14 +44,27 @@ public class Caesar {
         }
     }
     private void checkTextLanguage(String language){
-        if(language.equals("LanguageEnglish")&& checkTextLanguageUkraine() > checkTextLanguageEnglish()){
-            this.language = "LanguageUkraine";
+        if(language.equals(languageEnglish)&& checkTextLanguageUkraine() > checkTextLanguageEnglish()){
+            this.language = languageUkraine;
+            checkCipherDepth(this.language);
         }
-        else if(language.equals("LanguageUkraine")&& checkTextLanguageEnglish() > checkTextLanguageUkraine()){
-            this.language = "LanguageEnglish";
+        else if(language.equals(languageUkraine)&& checkTextLanguageEnglish() > checkTextLanguageUkraine()){
+            this.language = languageEnglish;
+            checkCipherDepth(this.language);
         }else {
             this.language = language;
+            checkCipherDepth(this.language);
         }
+    }
+    private void checkCipherDepth(String language){
+        if(language.equals(languageUkraine)){
+            setCipherDepth(DateAlphabet.UKRAINIAN.getDate().length());
+        } else if (language.equals(languageEnglish)) {
+            setCipherDepth(DateAlphabet.ENGLISH.getDate().length());
+        }
+    }
+    private void setCipherDepth(int cipherDepth){
+        this.cipherDepth = cipherDepth;
     }
     private int checkTextLanguageUkraine(){
         char[] dataArrayAlphabet = DateAlphabet.UKRAINIAN.getDate().toCharArray();
@@ -80,14 +98,14 @@ public class Caesar {
     }
     private void checkSelectKey(int key){
         if(this.language.equals("LanguageUkraine")){
-            int maxValue = DateAlphabet.UKRAINIAN.getDate().length()+1;
+            int maxValue = DateAlphabet.UKRAINIAN.getDate().length();
             if(key > 0 && key < maxValue){
                 this.retreat = key;
             }else {
                 this.retreat = generationRandomKey(maxValue);
             }
         } else if (this.language.equals("LanguageEnglish")) {
-            int maxValue = DateAlphabet.ENGLISH.getDate().length()+1;
+            int maxValue = DateAlphabet.ENGLISH.getDate().length();
             if(key > 0 && key < maxValue){
                 this.retreat = key;
             }else {
@@ -151,7 +169,8 @@ public class Caesar {
         this.decryptionText = result;
     }
 
-    public void bruteForce(int cipherDepth) {
+    private String bruteForceText;
+    public void bruteForce() {
         List<String> dataBaseResult = new ArrayList<>();
         for (int key = 1; key <= cipherDepth; key++) {
             StringBuilder result = new StringBuilder();
@@ -181,51 +200,9 @@ public class Caesar {
             }
             dataBaseResult.add(result.toString());
         }
-        System.out.println(analyzerBruteForce(dataBaseResult));
-    }
 
-    public String analyzerBruteForce(List<String> dataBaseResult) {
-        FileManager fileManager = new FileManager();
-        String result = null;
-        TreeMap<String,Integer> resultList = new TreeMap<>();
-        for (String element : dataBaseResult) {
-            List<String> linesElement = new ArrayList<>();
-            StringTokenizer stringTokenizer = new StringTokenizer(element," ");
-            int collScores = 0;
-            while (stringTokenizer.hasMoreTokens()){
-                linesElement.add(stringTokenizer.nextToken());
-            }
-
-            for(String linesEl : linesElement) {
-                char letter = linesEl.toUpperCase().charAt(0);
-                List<String> data;
-                if (fileManager.getData(letter) == null) {
-                    continue;
-                } else {
-                    data = new ArrayList<>(fileManager.getData(letter));
-                    for (String l : data) {
-
-                        if (linesEl.toLowerCase().equals(removeSpecialCharacters(l).toLowerCase())) {
-                            collScores++;
-                        }
-                    }
-                }
-
-            }
-            resultList.put(element,collScores);
-        }
-        String strResultList = null;
-        int  maxValueResultList = 0;
-        for(String em : resultList.keySet()){
-            Integer value = resultList.get(em);
-           // System.out.println(em + " --> " + value);
-            
-            if(value > maxValueResultList){
-                strResultList = em;
-                maxValueResultList = value;
-            }
-        }
-        return strResultList;
+        AnalysisManager analysisManager = new AnalysisManager();
+        this.bruteForceText = analysisManager.start(dataBaseResult);
     }
     private int generationRandomKey(int maxValue){
         System.out.println("спрацював генератор");
@@ -248,26 +225,6 @@ public class Caesar {
     public String getDecryptionText(){
         return  decryptionText;
     }
+    public String getBruteForceText(){return  bruteForceText;}
 
-    private String removeSpecialCharacters(String str){
-        int length = str.length();
-        String result = "";
-        char[] arrayStr = str.toCharArray();
-        char[] specialCharacters = DateAlphabet.SPECIAL_CHARACTERS.getDate().toCharArray();
-
-        boolean isSpecialCharacters;
-        for(int i = 0; i < arrayStr.length; i++){
-            isSpecialCharacters = false;
-           for(int j = 0; j < specialCharacters.length; j++){
-               if(arrayStr[i] == specialCharacters[j]){
-                    isSpecialCharacters = true;
-                   break;
-               }
-           }
-           if (!isSpecialCharacters){
-               result = result + String.valueOf(arrayStr[i]);
-           }
-        }
-        return result;
-    }
 }
