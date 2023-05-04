@@ -1,8 +1,13 @@
 package app.model.crypto;
 
+import app.model.Processor;
+import app.model.auxiliaryTools.ConfigFileUrl;
+import app.model.auxiliaryTools.FileManager;
 import app.model.keyboard.InlineButton;
 import app.model.message.Messages;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
@@ -12,6 +17,7 @@ import java.util.List;
 
 public class EncryptionMod {
     private static EncryptionMod encryptionMod;
+    private static Processor processor = Processor.getProcessor();
     public static EncryptionMod getEncryptionMod(){
         if(encryptionMod == null){
             encryptionMod = new EncryptionMod();
@@ -83,6 +89,8 @@ public class EncryptionMod {
         InlineButton keyboard = new InlineButton("Повернутися назад","back");
         keyboardButtonsRowOne.add(keyboard.getKeyboardButton());
     }
+    private boolean isOutputDataFile;
+    private boolean isOutputDataText;
     public SendMessage sendInfoEncryptionModMenu(String idChat){
         creatMarkupInlineMenuEncryptionMod();
         String text = "Я тобі пропуную вибрати декілька функцій зв'язані зі шифром \"Цезаря\"."
@@ -113,13 +121,27 @@ public class EncryptionMod {
         Caesar caesar = new Caesar(language,textUser,key);
         caesar.encryption();
         creatMarkupInlineBack();
-        String text = "Шифрування пройшло успішно:"+"\n"
-                +"Ключь доступа: "+ caesar.getKey() +"\n"+
-                "Мова: "+ caesar.getLanguage() +"\n"+
-                "Шифр: "+
-                "\n"+caesar.getEncryptionText();
         System.out.println("\nШифрування пройшло успішно "+"СТАТУС [OK]");
-        return new Messages(text,idChat,inlineKeyboardMarkup).creatMessages();
+        if(isOutputDataText){
+            String text = "Шифрування пройшло успішно:"+"\n"
+                    +"Ключь доступа: "+ caesar.getKey() +"\n"+
+                    "Мова: "+ caesar.getLanguage() +"\n"+
+                    "Шифр: "+
+                    "\n"+caesar.getEncryptionText();
+            return new Messages(text,idChat,inlineKeyboardMarkup).creatMessages();
+        }
+        else if(isOutputDataFile){
+            String text = "Шифрування пройшло успішно:"+"\n"
+                    +"Ключь доступа: "+ caesar.getKey() +"\n"+
+                    "Мова: "+ caesar.getLanguage() +"\n"+
+                    "Шифр: "+ caesar.getEncryptionText();
+
+            FileManager fileManager = new FileManager();
+            fileManager.writerFile(caesar.getEncryptionText(),"encryption.txt");
+
+            return new Messages(text,idChat,inlineKeyboardMarkup).creatMessages();
+        }
+        return new Messages("Винекла невідома помилка",idChat,inlineKeyboardMarkup).creatMessages();
     }
     public SendMessage sendInfoDecryptionSelectLanguage(String idChat){
         creatMarkupInlineSelectLanguage();
@@ -142,13 +164,27 @@ public class EncryptionMod {
         Caesar caesar = new Caesar(language,textUser,key);
         caesar.decryption();
         creatMarkupInlineBack();
-        String text = "Розшифрування пройшло успішно:" +"\n"
-                +"Ключь доступа: "+ caesar.getKey() +"\n"+
-                "Мова: "+ caesar.getLanguage() +"\n"+
-                "Шифр: "+
-                "\n"+caesar.getDecryptionText();
         System.out.println("\nРозшифрування пройшло успішно "+"СТАТУС [OK]");
-        return new Messages(text,idChat,inlineKeyboardMarkup).creatMessages();
+        if(isOutputDataText){
+            String text = "Розшифрування пройшло успішно:" +"\n"
+                    +"Ключь доступа: "+ caesar.getKey() +"\n"+
+                    "Мова: "+ caesar.getLanguage() +"\n"+
+                    "Шифр: "+
+                    "\n"+caesar.getDecryptionText();
+            return new Messages(text,idChat,inlineKeyboardMarkup).creatMessages();
+        }
+        else if(isOutputDataFile){
+            String text = "Шифрування пройшло успішно:"+"\n"
+                    +"Ключь доступа: "+ caesar.getKey() +"\n"+
+                    "Мова: "+ caesar.getLanguage() +"\n"+
+                    "Шифр: "+ caesar.getDecryptionText();
+
+            FileManager fileManager = new FileManager();
+            fileManager.writerFile(caesar.getDecryptionText(),"decryption.txt");
+
+            return new Messages(text,idChat,inlineKeyboardMarkup).creatMessages();
+        }
+        return new Messages("Винекла невідома помилка",idChat,inlineKeyboardMarkup).creatMessages();
     }
     public SendMessage sendInfoBrutForceAttackSelectLanguage(String idChat){
         creatMarkupInlineSelectLanguage();
@@ -166,11 +202,24 @@ public class EncryptionMod {
         Caesar caesar = new Caesar(language,textUser);
         caesar.bruteForce();
         creatMarkupInlineBack();
-        String text = "Брут форс атака пройшла успішно:"+"\n"+
-                "Текст: "+
-                "\n"+caesar.getBruteForceText();
         System.out.println("\nБрут форс атака пройшла успішно "+"СТАТУС [OK]");
-        return new Messages(text,idChat,inlineKeyboardMarkup).creatMessages();
+        if(isOutputDataText){
+            String text = "Брут форс атака пройшла успішно:"+"\n"+
+                    "Текст: "+
+                    "\n"+caesar.getBruteForceText();
+            return new Messages(text,idChat,inlineKeyboardMarkup).creatMessages();
+        }
+        else if(isOutputDataFile){
+            String text = "Брут форс атака пройшла успішно:"+"\n"+
+                    "Текст: "+
+                    "\n"+caesar.getBruteForceText();
+
+            FileManager fileManager = new FileManager();
+            fileManager.writerFile(caesar.getBruteForceText(),"brutForce.txt");
+
+            return new Messages(text,idChat,inlineKeyboardMarkup).creatMessages();
+        }
+        return new Messages("Винекла невідома помилка",idChat,inlineKeyboardMarkup).creatMessages();
     }
     private boolean isActiveEncryptionMod = false;
     private String language;
@@ -193,6 +242,13 @@ public class EncryptionMod {
     public void setStageSetting(String stageSetting) {
         this.stageSetting = stageSetting;
     }
+    public void setIsOutputDataFile(boolean status){
+        this.isOutputDataFile = status;
+    }
+    public void setIsOutputDataText(boolean status){
+        this.isOutputDataFile = status;
+    }
+
     public String getEncryptionModOption(){
         return encryptionModOption;
     }

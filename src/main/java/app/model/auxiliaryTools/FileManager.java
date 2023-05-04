@@ -1,20 +1,16 @@
 package app.model.auxiliaryTools;
 
-import com.sun.security.auth.login.ConfigFile;
-
+import java.io.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class FileManager {
-    private String nameFile;
-
-
-
     public List<String> getData(char letter){
-        String urlFile = checkLetterDbUrl(letter);
+        String urlFile = getLetterDbUrl(letter);
         if(urlFile == null){
             return  null;
         }
@@ -32,7 +28,7 @@ public class FileManager {
     }
 
 
-    private String checkLetterDbUrl(char letter){
+    private String getLetterDbUrl(char letter){
 
         if(letter == 'A'){
             return ConfigFileUrl.A.getUrlLink();
@@ -110,5 +106,38 @@ public class FileManager {
             return ConfigFileUrl.X.getUrlLink();
         }
         return null;
+    }
+
+
+
+
+    public String writerFile(String data, String type){
+        String urlResultFile = ConfigFileUrl.SEND_FILE.getUrlLink()+type;
+        try(FileWriter writer = new FileWriter(urlResultFile)) {
+            writer.write(data);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return urlResultFile;
+    }
+    public String readFile(String url){
+       String unencryptedTerm = null;
+        try(FileInputStream fileInputStream = new FileInputStream(url);
+        InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+            unencryptedTerm = bufferedReader.readLine();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return unencryptedTerm;
+    }
+    public void deleteFile(String url){
+        File file = new File(url);
+        file.delete();
+        System.out.println("Файл був знищений");
     }
 }

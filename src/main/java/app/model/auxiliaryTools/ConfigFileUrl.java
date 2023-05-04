@@ -1,6 +1,8 @@
 package app.model.auxiliaryTools;
 
 public enum ConfigFileUrl {
+    DOWNLOAD_FILE("C:\\Users\\Ira\\Desktop\\com.bot.telegram\\BotManager\\src\\main\\resources\\downloadFile\\"),
+    SEND_FILE("C:\\Users\\Ira\\Desktop\\com.bot.telegram\\BotManager\\src\\main\\resources\\sendFile\\"),
     A("C:\\Users\\Ira\\Desktop\\com.bot.telegram\\BotManager\\src\\main\\java\\app\\db\\ukraine\\A.txt"),
     V("C:\\Users\\Ira\\Desktop\\com.bot.telegram\\BotManager\\src\\main\\java\\app\\db\\ukraine\\B.txt"),
     B("C:\\Users\\Ira\\Desktop\\com.bot.telegram\\BotManager\\src\\main\\java\\app\\db\\ukraine\\Б.txt"),

@@ -1,14 +1,18 @@
 package app.model;
 
+import app.model.auxiliaryTools.FileManager;
 import app.model.crypto.EncryptionMod;
 import app.model.keyboard.InlineButton;
 import app.model.keyboard.ProcessorButton;
 import app.model.message.Messages;
 import app.model.teams.*;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Processor{
     private Update update;
@@ -32,43 +36,60 @@ public class Processor{
     private String inputIdChat;
     private String inputCallBackData;
     private SendMessage outputMessage;
+    private SendDocument outputDocument;
     private String userInputMessage;
     private String userInputTeam;
 
-    public SendMessage processorStart(Update update) throws IOException {
-        this.update = update;
-        if(update.hasMessage()){
-            this.userInputMessage = update.getMessage().getText();
-            this.inputIdChat = String.valueOf(update.getMessage().getChatId());
-            executeProcessorTeam();
-        } else if (update.hasCallbackQuery()) {
-            this.inputIdChat = String.valueOf(update.getCallbackQuery().getMessage().getChatId());
-            this.inputCallBackData = update.getCallbackQuery().getData();
-            executeProcessorButton();
-        }
+
+    public SendMessage executeProcessorButton(Update update) throws IOException {
+        this.inputIdChat = String.valueOf(update.getCallbackQuery().getMessage().getChatId());
+        this.inputCallBackData = update.getCallbackQuery().getData();
+        processorButton = ProcessorButton.getProcessorButton();
+        this.outputMessage = processorButton.startProcessorButton(inputCallBackData, inputIdChat);
         return outputMessage;
     }
+    public SendMessage executeProcessorFile(String urlFile){
+        FileManager fileManager = new FileManager();
 
-    public void executeProcessorTeam(){
+        if(checkEncryptionMod()){
+            String unencryptedTerm = fileManager.readFile(urlFile);
+            this.userInputMessage = unencryptedTerm;
+            encryptionMod.setIsOutputDataFile(true);
+            executeProcessorEncryptionMod();
+            return outputMessage;
+        }else {
+            fileManager.deleteFile(urlFile);
+            return new Messages("Режим криптографії Не включений, файл знищенний.",inputIdChat).creatMessages();
+        }
+    }
+    public SendMessage executeProcessorMessage(Update update){
         System.out.println("Повідомлення отримав, починаю опрацьовувати  СТАТУС [ОК]");
+        this.userInputMessage = update.getMessage().getText();
+        this.inputIdChat = String.valueOf(update.getMessage().getChatId());
 
         if(checkCommands(userInputMessage)) {
-            processorTeam = new ProcessorTeam(inputIdChat, userInputTeam);
-            this.outputMessage = processorTeam.start();
-        } else if (encryptionMod != null && encryptionMod.getIsActiveEncryptionMod()) {
-            this.outputMessage = encryptionMod.configurationEncryptionMod(userInputMessage, inputIdChat);
-            if(encryptionMod.getIsResetEncryptionMod()){
-                encryptionMod.resetEncryptionMod();
-            }
-        }else {
+            executeProcessorTeam();
+        }  else if (checkEncryptionMod()) {
+            encryptionMod.setIsOutputDataText(true);
+            executeProcessorEncryptionMod();
+        }
+        else {
             this.outputMessage = new Messages(
                     "Невідома команда.\n Для отримання списока команд напишіть /help",
                     inputIdChat).creatMessages();
         }
+        return outputMessage;
     }
-    public void executeProcessorButton() throws IOException {
-        processorButton = ProcessorButton.getProcessorButton();
-        this.outputMessage = processorButton.startProcessorButton(inputCallBackData, inputIdChat);
+    private SendMessage executeProcessorTeam(){
+        processorTeam = new ProcessorTeam(inputIdChat, userInputTeam);
+        this.outputMessage = processorTeam.start();
+        return outputMessage;
+    }
+    private void executeProcessorEncryptionMod(){
+        this.outputMessage = encryptionMod.configurationEncryptionMod(userInputMessage, inputIdChat);
+        if(encryptionMod.getIsResetEncryptionMod()){
+            encryptionMod.resetEncryptionMod();
+        }
     }
     private boolean checkCommands(String message) {
         char key = message.charAt(0);
@@ -78,14 +99,20 @@ public class Processor{
         }
         return false;
     }
-
     private void initiation(){
         this.team = Team.getTeam();
     }
-
     public void setEncryptionMod(EncryptionMod link){
         encryptionMod = link;
     }
+    private boolean checkEncryptionMod(){
+        return  encryptionMod != null && encryptionMod.getIsActiveEncryptionMod();
+    }
 
-
+    public SendDocument getOutputDocument(){
+        return outputDocument;
+    }
+    public void setOutputDocument(SendDocument sendDocument){
+        this.outputDocument = sendDocument;
+    }
 }
