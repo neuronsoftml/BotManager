@@ -1,8 +1,8 @@
 package app.setting;
 
 public enum BotConfig {
-    BOT_NAME("Manager_BOT"),
-    BOT_TOKEN("5930682693:AAHaawGeIlNdUWeDN6A8Hl4wt-VmC8j6hNY");
+    BOT_NAME("Напиши їм'я свого бота."),
+    BOT_TOKEN("Напиши свій токен.");
     private String value;
     BotConfig(String value) {
         this.value = value;
